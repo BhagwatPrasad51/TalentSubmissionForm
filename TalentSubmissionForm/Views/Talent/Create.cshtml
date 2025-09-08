@@ -1,0 +1,218 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@model TalentSubmissionForm.Models.TalentUserCreate
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Talent Submission</title>
+    <meta name="description" content="Lightweight, modern talent submission form" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/style.css" />
+    <link rel="stylesheet" href="~/css/Submit.css" />
+    <link rel="stylesheet" href="~/css/jquery-ui.css" />
+
+    <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="~/js/bootstrap.js"></script>
+    <script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script type="test/javascript" src="~/lib/jquery/dist/jquery-ui.js"></script>
+
+
+
+    <script type="text/javascript">
+           $(document).ready(function () {
+          
+         // file Upload
+
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const statusDiv = document.getElementById('uploadStatus');
+
+        // Click fallback
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        // Handle file input selection
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                uploadFile(fileInput.files);  // pass all selected files as FileList
+            }
+        });
+
+        // Prevent default drag behavior
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        // Visual feedback
+        dropzone.addEventListener('dragover', () => dropzone.style.borderColor = '#007bff');
+        dropzone.addEventListener('dragleave', () => dropzone.style.borderColor = '#aaa');
+
+        // Handle file drop
+        dropzone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) uploadFile(files);  // pass FileList here too
+        });
+
+        // Upload logic accepts FileList or Array of files
+        function uploadFile(files) {
+            debugger;
+            if (!files || files.length === 0) {
+                statusDiv.textContent = "No files to upload.";
+                return false;
+            }
+
+            if (window.FormData === undefined) {
+                statusDiv.textContent = "Your browser doesn't support file uploads.";
+                return false;
+            }
+
+            var currentValue = parseInt($('#counting').text()) || 0;
+
+            if (currentValue + files.length > 4) {
+                $('#uploadStatus').text("You can upload max 4 files.").show();
+                dropzone.style.borderColor = 'red';
+                return false;
+            }
+
+            var validFileExtensions = ['jpeg', 'jpg', 'png', 'webp'];
+            var fileData = new FormData();
+
+            // Validate each file
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var extension = file.name.split('.').pop().toLowerCase();
+
+                if (validFileExtensions.indexOf(extension) === -1) {
+                    $('#uploadStatus').text("Please upload jpg, png, or WebP files only.").show();
+                    dropzone.style.borderColor = 'red';
+                    return false;
+                }
+
+                if (file.size > 10 * 1024 * 1024) {
+                    $('#uploadStatus').text("Each file must be less than 10MB.").show();
+                    dropzone.style.borderColor = 'red';
+                    return false;
+                }
+
+                fileData.append('files', file);
+            }
+
+            $('#uploadStatus').text("").hide();
+            dropzone.style.borderColor = '#aaa';
+
+            $.ajax({
+                url: '@Url.Action("UploadFiles", "Talent")', 
+                type: "POST",
+                contentType: false,
+                processData: false,
+                data: fileData,
+                success: function (result) {
+                  debugger;
+                     const filename = result.filename;
+                     const imageUrl = result.fileurl;
+                     const imgHtml = `<div class="uploaded-image" data-filename="${filename}" style="display:inline-block; position:relative; margin:5px; text-align:center;">
+            <img src="${imageUrl}" alt="Uploaded Image" style="max-width: 200px; max-height: 400px; display:block; margin-bottom: 5px;" />
+            <input type="hidden" name="images" value="${filename}" />
+            <button type="button" class="remove-file-text" style="background:none; color:red; border:none; cursor:pointer; font-size:14px;">🗑️ Remove File</button>
+        </div>`;
+                      $('#img').append(imgHtml);
+                     
+                    currentValue++;
+                    $('#counting').text(currentValue);
+                    $('#uploadStatus').text('✅ Uploaded Successfully.').css('color', 'green').show();
+                    dropzone.style.borderColor = '#28a745';
+                    fileInput.value = '';
+                },
+        
+                error: function (xhr, status, error) {
+                    $('#uploadStatus').text(`❌ Upload error: ${error}`).css('color', 'red').show();
+                    dropzone.style.borderColor = 'red';
+                }
+            });
+        }
+
+          // Remove File
+
+            $('#img').on('click',  '.remove-image-btn, .remove-file-text', function() {
+            const container = $(this).closest('.uploaded-image');
+            const filename = container.data('filename');
+
+            $.ajax({
+                url: '@Url.Action("RemoveFile", "Talent")',
+                type: 'POST',
+                data: { filename: filename },
+                success: function() {
+
+                    container.remove();
+                    $(`#imgCount input[value="${filename}"]`).remove();
+
+
+                    let currentCount = parseInt($('#counting').text()) || 1;
+                    currentCount = Math.max(0, currentCount - 1);
+                    $('#counting').text(currentCount);
+
+                    $('#uploadStatus').text(`Removed ${filename}`).css('color', 'green').show();
+                    dropzone.style.borderColor = '#aaa';
+                },
+                error: function() {
+                    $('#uploadStatus').text(`Failed to remove ${filename}`).css('color', 'red').show();
+                }
+            });
+        });
+
+
+           //Reset
+           $(document).on('click', '#resetBtn', function (e) {
+                  var redirectionURl = '@Url.Action("Reset", "Talent")';
+                  window.location.href = redirectionURl;
+
+           });
+
+           //Back
+           $(document).on('click', '#backBtn', function (e) {
+                  var redirectionURl = '@Url.Action("Create", "Talent")';
+                  window.location.href = redirectionURl;
+
+           });
+        });
+    </script>
+    @if (TempData["Message"] != null)
+    {
+        <script type="text/javascript">
+            alert(" “Submitted, someone will be in touch”.");
+        </script>
+        TempData["Message"] = null;
+    }
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js"></script>
+
+
+
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div>
+                <div class="title">Talent Submission</div>
+                <div class="subtitle">Slick, lightweight form for modelling / acting / dating show & podcast opportunities.</div>
+            </div>
+            <button class="btn ghost text-end" id="resetBtn" type="button" aria-label="Reset form">Reset</button>
+        </header>
+       
+        @await Html.PartialAsync("~/Views/Shared/_Form.cshtml", Model)
+    </div>
+
+
+</body>
+</html>

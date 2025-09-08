@@ -1,0 +1,168 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@model TalentSubmissionForm.Models.TalentUserCreate
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.2.1/styles/ag-grid.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.2.1/styles/ag-theme-alpine.css" rel="stylesheet" />
+
+    <script src="~/lib/jquery/dist/AGGrid.js" type="text/javascript"></script>
+
+    <script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
+    <style>
+        .exportCSV {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: 20px;
+            margin-right: 30px;
+        }
+
+        .logout {
+            margin-left: 20px;
+            margin-right: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h2>All Talent Users</h2>
+    <div style="display:flex;justify-content:right;">
+        <a asp-controller="Admin" asp-action="Logout" class="btn btn-outline-success logout">Log Out</a>
+    </div>
+    <div style="display:flex;justify-content:right;">
+        <button id="btnExport" class="exportCSV">Export to Excel</button>
+    </div>
+
+    <div id="talentUserGrid" class="ag-theme-alpine" style="height: 500px; width: 100%;"></div>
+
+    <script>
+           const columnDefs = [
+             { headerName: "ID", field: "Id" },
+             { headerName: "First Name", field: "FirstName" },
+             { headerName: "Last Name", field: "LastName" },
+             { headerName: "Date Of Birth", field: "DOB" },
+             { headerName: "City (Location)", field: "City" },
+             { headerName: "Gender", field: "Gender" },
+             { headerName: "Email", field: "Email" },
+             { headerName: "Phone", field: "Phone" },
+             { headerName: "Height", field: "Hieght" },
+             { headerName: "Interests", field: "Interest" },
+             { headerName: "Social Information", field: "SocialInfo" },
+             { headerName: "Other Information", field: "OtherInfo" },
+                 {
+                 headerName: "Actions",
+                 suppressCsvExport: true,
+                 cellRenderer: params => {
+                   // Create a button element
+                   const button = document.createElement('button');
+                   button.classList.add('btn', 'btn-primary', 'btn-sm');
+                      button.textContent = 'Edit Details';
+
+                   // On click, redirect to Edit page with the Id
+                   button.addEventListener('click', () => {
+                     // Replace with your actual edit URL pattern
+                     const userId = encodeURIComponent(params.data.EncodeID);
+                     window.location.href = `/Admin/Edit?Encodeid=${userId}`;
+                   });
+
+                   return button;
+                 },
+                 width: 120,
+                 pinned: 'right', // optional: fix column on right
+                 suppressSizeToFit: true
+               }
+           ];
+
+           const gridOptions = {
+               columnDefs: columnDefs,
+               rowData: [], // initially empty
+               defaultColDef: {
+                   resizable: true,
+                   sortable: true,
+                   filter: true
+               },
+               pagination: true,
+               paginationPageSize:10, // Default value
+               paginationAutoPageSize: false,
+               domLayout: 'autoHeight',
+               animateRows: true,
+
+
+           };
+
+           // Load data from backend
+           document.addEventListener('DOMContentLoaded', function () {
+               const gridDiv = document.getElementById('talentUserGrid');
+               new agGrid.Grid(gridDiv, gridOptions);
+
+               fetch('/Admin/GetAllUsers')
+                   .then(response => response.json())
+                   .then(data => {
+                       gridOptions.api.setRowData(data);
+                       // gridOptions.api.paginationSetPageSize(20);
+                        const newSize = Number('10');
+                       gridOptions.api.paginationSetPageSize(newSize);
+                   })
+                   .catch(error => {
+                       console.error('Error loading data:', error);
+                   });
+
+                    // Export visible data (sorted, filtered)
+              document.getElementById("btnExport").addEventListener("click", function () {
+                  const currentPage = gridOptions.api.paginationGetCurrentPage();
+                  const pageSize = gridOptions.api.paginationGetPageSize();
+                  const startRow = currentPage * pageSize;
+                  const endRow = startRow + pageSize;
+                  const filteredSortedData = [];
+                  for (let i = startRow; i < endRow; i++) {
+                        const rowNode = gridOptions.api.getDisplayedRowAtIndex(i);
+                       if (rowNode) {
+                                 filteredSortedData.push(rowNode.data);
+                       }
+                   }
+
+               // Send to backend via POST
+               fetch('/Admin/ExportToExcel', {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'application/json'
+                   },
+                   body: JSON.stringify(filteredSortedData)
+               })
+               .then(response => {
+                   if (!response.ok) {
+                       throw new Error("Failed to export.");
+                   }
+                   return response.blob(); // expect Excel file blob
+               })
+               .then(blob => {
+                   const url = window.URL.createObjectURL(blob);
+                   const a = document.createElement('a');
+                   a.href = url;
+                   a.download = 'Applicants.xlsx';
+                   document.body.appendChild(a);
+                   a.click();
+                   a.remove();
+               })
+               .catch(error => {
+                   console.error('Export error:', error);
+                   alert('❌ Export failed. Check the console.');
+               });
+           });
+
+        });
+
+
+
+    </script>
+
+</body>
+</html>
