@@ -1,0 +1,43 @@
+﻿body {
+    background-color: #f8f9fa;
+}
+
+.success-container {
+    max-width: 600px;
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+.success-icon {
+    font-size: 80px;
+    color: #28a745;
+}
+
+.success-message {
+    font-size: 1.25rem;
+    margin-top: 20px;
+    color: #333;
+}
+
+.btn-home {
+    margin-top: 30px;
+}
+
+/* ✅ Responsive adjustments */
+@media (max-width: 576px) {
+    .success-container {
+        margin: 20px 10px;
+        padding: 30px 15px;
+    }
+
+    .success-icon {
+        font-size: 60px;
+    }
+
+    .success-message {
+        font-size: 1rem;
+    }
+}

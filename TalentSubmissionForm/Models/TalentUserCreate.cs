@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TalentSubmissionForm.Helper;
 using TalentSubmissionForm.Validation;
 
 namespace TalentSubmissionForm.Models
@@ -22,7 +24,6 @@ namespace TalentSubmissionForm.Models
         public string gender { get; set; }
         [Required(ErrorMessage = "Please fill email.")]
         [EmailAddress(ErrorMessage = "Invalid Email Address.")]
-        [UniqueEmail]
         public string email { get; set; }
         [Required(ErrorMessage = "Please fill Phone Number.")]
         [RegularExpression(@"^\+\d{1,3}\d{4,14}(?:x.+)?$", ErrorMessage = "Phone number must start with '+' followed by country code and digits.")]
@@ -41,5 +42,8 @@ namespace TalentSubmissionForm.Models
         [Required(ErrorMessage = "Please upload at least 2 image.")]
         [MinValidation(2, ErrorMessage = "Please upload at least 2 image.")]
         public List<string> images { get; set; }
+        public string? Note { get; set; }
+        public ApplicationStatus? Status { get; set; }
+       
     }
 }

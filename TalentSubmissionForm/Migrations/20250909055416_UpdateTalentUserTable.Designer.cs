@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TalentSubmissionForm.Data;
 
@@ -10,9 +11,11 @@ using TalentSubmissionForm.Data;
 namespace TalentSubmissionForm.Migrations
 {
     [DbContext(typeof(TalentContext))]
-    partial class TalentContextModelSnapshot : ModelSnapshot
+    [Migration("20250909055416_UpdateTalentUserTable")]
+    partial class UpdateTalentUserTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

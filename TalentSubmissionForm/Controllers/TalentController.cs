@@ -54,10 +54,12 @@ namespace TalentSubmissionForm.Controllers
         }
         [HttpPost]
         [AllowAnonymous]
-        public IActionResult Create([Bind("firstName,lastName,dob,city,gender,email,phone,interests,socials,otherInfo,Height,images")] TalentUserCreate talentUserCreate)
+        public IActionResult Create([Bind("firstName,lastName,dob,city,gender,email,phone,interests,socials,otherInfo,Height,images,Status,Note")] TalentUserCreate talentUserCreate)
         {
             try
             {
+                ViewData["FormAction"] = "Create";
+                ViewData["FormController"] = "Talent";
                 if (ModelState.IsValid)
                 {
                     TalentUser talentUser = new TalentUser();
@@ -235,12 +237,6 @@ namespace TalentSubmissionForm.Controllers
             HttpContext.Session.SetInt32("TalentId", TalentID);
             return RedirectToAction("Create");
         }
-        [AllowAnonymous]
-        public IActionResult Error(string ErrorMessage="")
-        {
-            var feature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
-            var exception = feature?.Error;
-            return View(model: ErrorMessage);
-        }
+        
     }
 }

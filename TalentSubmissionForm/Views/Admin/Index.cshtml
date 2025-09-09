@@ -11,44 +11,122 @@
 <head>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap-icons.css" rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.2.1/styles/ag-grid.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.2.1/styles/ag-theme-alpine.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap/dist/css/ag-grid.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap/dist/css/ag-theme-alpine.css" rel="stylesheet" />
 
     <script src="~/lib/jquery/dist/AGGrid.js" type="text/javascript"></script>
 
+    <script type="text/javascript" src="~/lib/bootstrap//dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/css/Submit.css" />
     <style>
-        .exportCSV {
-            margin-top: 10px;
-            margin-bottom: 10px;
-            margin-left: 20px;
-            margin-right: 30px;
-        }
 
         .logout {
-            margin-left: 20px;
+           display:flex;justify-content:right;
+           margin-left: 10px;
+            margin-right: 30px;
+            margin-top: 5px;
+            text-align:center;
+            height:40px;
+            align-items:center;
+        }
+
+        .edit {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            margin-left: 10px;
             margin-right: 30px;
         }
+
+        .ag-root-wrapper-body .btn {
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            line-height: 16px;
+            font-size: 12px;
+            font-weight: 600;
+        }
     </style>
+    @if (TempData["ShowUpdateSuccess"] != null)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const updateModal = new bootstrap.Modal(document.getElementById('updateSuccessModal'));
+                updateModal.show();
+            });
+        </script>
+    }
+    @if (TempData["ShowUserAddedSuccess"] != null)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const UserAddedModal = new bootstrap.Modal(document.getElementById('UserAddedSuccessModal'));
+                UserAddedModal.show();
+            });
+        </script>
+    }
 </head>
 <body>
-    <h2>All Talent Users</h2>
-    <div style="display:flex;justify-content:right;">
-        <a asp-controller="Admin" asp-action="Logout" class="btn btn-outline-success logout">Log Out</a>
-    </div>
-    <div style="display:flex;justify-content:right;">
-        <button id="btnExport" class="exportCSV">Export to Excel</button>
-    </div>
+    <div class="container">
 
-    <div id="talentUserGrid" class="ag-theme-alpine" style="height: 500px; width: 100%;"></div>
+        <header class="header">
+            <div>
+                <div class="title">All Talent Users</div>
+            </div>
+            <a asp-controller="Admin" asp-action="Logout" class="btn btn-outline-danger logout" >Log Out</a>
+        </header>
+        <div style="display:flex;justify-content:right;">
+            <a asp-controller="Admin" asp-action="Register" class="btn btn-outline-secondary" style="display:flex;justify-content:right;margin-right:650px">Add New User</a>
+            <button id="btnExport" class="btn btn-outline-success">Export to Excel</button>
+        </div>
 
+        <div id="talentUserGrid" class="ag-theme-alpine" style="height: 600px; width: 100%;margin-top:15px;margin-bottom:10px;"></div>
+
+        <!-- Success Modal -->
+        <div class="modal fade" id="updateSuccessModal" tabindex="-1" aria-labelledby="updateSuccessModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-success">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="updateSuccessModalLabel">
+                            ✅  Success
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p class="mb-0">✅ Record updated successfully!</p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- User Added Success Modal -->
+        <div class="modal fade" id="UserAddedSuccessModal" tabindex="-1" aria-labelledby="UserAddedSuccessModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-success">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title" id="UserAddedSuccessModalLabel">
+                            ✅ User Added
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p class="mb-0">✅ User has been Added successfully.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
            const columnDefs = [
-             { headerName: "ID", field: "Id" },
              { headerName: "First Name", field: "FirstName" },
              { headerName: "Last Name", field: "LastName" },
-             { headerName: "Date Of Birth", field: "DOB" },
+             { headerName: "Date Of Birth (yyyy-MM-dd)", field: "DOB" },
              { headerName: "City (Location)", field: "City" },
              { headerName: "Gender", field: "Gender" },
              { headerName: "Email", field: "Email" },
@@ -57,25 +135,28 @@
              { headerName: "Interests", field: "Interest" },
              { headerName: "Social Information", field: "SocialInfo" },
              { headerName: "Other Information", field: "OtherInfo" },
+             { headerName: "Note", field: "Note" },
+             { headerName: "Status", field: "Status" },
                  {
                  headerName: "Actions",
                  suppressCsvExport: true,
-                 cellRenderer: params => {
-                   // Create a button element
-                   const button = document.createElement('button');
-                   button.classList.add('btn', 'btn-primary', 'btn-sm');
-                      button.textContent = 'Edit Details';
+                    cellRenderer: params => {
 
-                   // On click, redirect to Edit page with the Id
-                   button.addEventListener('click', () => {
-                     // Replace with your actual edit URL pattern
+           // Create a button element
+            const button = document.createElement('button');
+            button.classList.add('btn', 'btn-primary', 'btn-sm');
+            button.textContent = 'Edit Details';
+
+            // On click, redirect to Edit page with the Id
+            button.addEventListener('click', () => {
+              // Replace with your actual edit URL pattern
                      const userId = encodeURIComponent(params.data.EncodeID);
                      window.location.href = `/Admin/Edit?Encodeid=${userId}`;
-                   });
+            });
 
-                   return button;
-                 },
-                 width: 120,
+            return button;
+        },
+                 width: 130,
                  pinned: 'right', // optional: fix column on right
                  suppressSizeToFit: true
                }
@@ -84,6 +165,7 @@
            const gridOptions = {
                columnDefs: columnDefs,
                rowData: [], // initially empty
+               rowHeight: 40,
                defaultColDef: {
                    resizable: true,
                    sortable: true,

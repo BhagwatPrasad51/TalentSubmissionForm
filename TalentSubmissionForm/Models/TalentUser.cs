@@ -25,6 +25,8 @@ namespace TalentSubmissionForm.Models
         public bool IsDeleted { get; set; }
         public string? Deletedon { get; set; }
         public string Hieght { get; set; }
+        public string? Note { get; set; }
+        public string? Status { get; set; } 
         [NotMapped]
         public string EncodeID
         {

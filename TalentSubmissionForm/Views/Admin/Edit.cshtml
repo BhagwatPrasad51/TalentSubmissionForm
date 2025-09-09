@@ -1,7 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-
+﻿
 @model TalentSubmissionForm.Models.TalentUserCreate
 @{
     Layout = null;
@@ -17,14 +14,12 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/style.css" />
     <link rel="stylesheet" href="~/css/Submit.css" />
-    <script type="text/javascript" src="~/js/bootstrap.js"></script>
+    <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
     <script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
 
-          
-             // file Upload
-
+        // file Upload
         const dropzone = document.getElementById('dropzone');
         const fileInput = document.getElementById('fileInput');
         const statusDiv = document.getElementById('uploadStatus');
@@ -59,7 +54,7 @@
 
         // Upload logic accepts FileList or Array of files
         function uploadFile(files) {
-            debugger;
+           
             if (!files || files.length === 0) {
                 statusDiv.textContent = "No files to upload.";
                 return false;
@@ -111,13 +106,13 @@
                 processData: false,
                 data: fileData,
                 success: function (result) {
-                  debugger;
                      const filename = result.filename;
                      const imageUrl = result.fileurl;
                      const imgHtml = `<div class="uploaded-image" data-filename="${filename}" style="display:inline-block; position:relative; margin:5px; text-align:center;">
             <img src="${imageUrl}" alt="Uploaded Image" style="max-width: 200px; max-height: 400px; display:block; margin-bottom: 5px;" />
-            <input type="hidden" name="images" value="${filename}" />
-            <button type="button" class="remove-file-text" style="background:none; color:red; border:none; cursor:pointer; font-size:14px;">🗑️ Remove File</button> </div>`;
+            <input type="hidden" name="images" value="${filename}" /><div style="display: flex; justify-content: center; gap: 10px;">
+            <button type="button" class="remove-file-text" style="background:none; color:red; border:none; cursor:pointer; font-size:14px;">🗑️ Remove File</button>
+             <a href="${imageUrl}" download="${filename}" class="download-file-link" style="text-decoration: none; color: blue; font-size:14px;">⬇️ Download</a></div></div>`;
                       $('#img').append(imgHtml);
                      
                     currentValue++;
@@ -135,7 +130,6 @@
         }
 
           // Remove File
-
             $('#img').on('click', '.remove-image-btn ,.remove-file-text', function() {
             const container = $(this).closest('.uploaded-image');
             const filename = container.data('filename');
@@ -162,7 +156,6 @@
                 }
             });
         });
-
 
            //Back
            $(document).on('click', '#backBtn', function (e) {

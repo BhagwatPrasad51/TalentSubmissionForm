@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using OfficeOpenXml;
 using System.Security.Claims;
 using System.Text.Json;
+using TalentSubmissionForm.Helper;
 using TalentSubmissionForm.Models;
 
 namespace TalentSubmissionForm.Controllers
@@ -91,7 +92,8 @@ namespace TalentSubmissionForm.Controllers
                     return View();
                 }
                 TempData["Success"] = "Registration successful!";
-                return RedirectToAction("Login");
+                TempData["ShowUserAddedSuccess"] = "Success";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
@@ -198,12 +200,13 @@ namespace TalentSubmissionForm.Controllers
 
         [HttpPost]
 
-        public IActionResult Edit([Bind("Id,firstName,lastName,dob,city,gender,email,phone,interests,socials,otherInfo,Height,images")] TalentUserCreate talentUserCreate)
+        public IActionResult Edit([Bind("Id,firstName,lastName,dob,city,gender,email,phone,interests,socials,otherInfo,Height,images,Status,Note")] TalentUserCreate talentUserCreate)
         {
             try
             {
                 ViewData["FormAction"] = "Edit";
                 ViewData["FormController"] = "Admin";
+                
                 if (ModelState.IsValid)
                 {
                     TalentUser talentUser = new TalentUser();
@@ -223,8 +226,11 @@ namespace TalentSubmissionForm.Controllers
                         talentUser.Interest += res + ",";
                     }
                     talentUser.Interest = talentUser.Interest.TrimEnd(',');
+                    talentUser.Note = talentUserCreate.Note;
+                    talentUser.Status= talentUserCreate.Status?.GetDisplayName();
                     _talentService.UpdateDetails(talentUser);
                     _talentService.UpdateUploadFiles(talentUserCreate.images, talentUser.Id);
+                    TempData["ShowUpdateSuccess"] = "Success";
                     return RedirectToAction("Index");
                 }
 
@@ -265,6 +271,8 @@ namespace TalentSubmissionForm.Controllers
                         worksheet.Cell(1, 9).Value = "Interests";
                         worksheet.Cell(1, 10).Value = "Social Information";
                         worksheet.Cell(1, 11).Value = "Other Information";
+                        worksheet.Cell(1, 12).Value = "Note";
+                        worksheet.Cell(1, 13).Value = "Status";
 
                         int row = 2;
                         foreach (var app in applicants)
@@ -280,6 +288,8 @@ namespace TalentSubmissionForm.Controllers
                             worksheet.Cell(row, 9).Value = app.Interest;
                             worksheet.Cell(row, 10).Value = app.SocialInfo;
                             worksheet.Cell(row, 11).Value = app.OtherInfo;
+                            worksheet.Cell(row, 10).Value = app.Note;
+                            worksheet.Cell(row, 11).Value = app.Status;
                             row++;
                         }
 
@@ -303,8 +313,10 @@ namespace TalentSubmissionForm.Controllers
                 });
             }
         }
+        //LogOut
         public IActionResult Logout()
         {
+            TempData["ShowLogoutSuccess"] = "Success";
             HttpContext.SignOutAsync("MyCookieAuth");
             return RedirectToAction("Login");
         }

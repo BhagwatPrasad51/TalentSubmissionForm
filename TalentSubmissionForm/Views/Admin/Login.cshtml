@@ -1,39 +1,35 @@
 ﻿@model LoginViewModel
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-grid.css">
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/style.css" />
-
-
-<script type="text/javascript" src="~/js/bootstrap.js"></script>
-<script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
-
-
 @{
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Log in - Talent Submission</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <script type="text/javascript" src="~/lib/bootstrap//dist/js/bootstrap.bundle.min.js"></script>
     <style>
         body {
             background: #f0f2f5;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 15px;
         }
 
         .login-card {
             background: white;
-            width: 360px;
-            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
@@ -64,24 +60,28 @@
                 background: linear-gradient(90deg, #574bff 0%, #6c63ff 100%);
             }
 
-        .form-check-label {
-            font-weight: 500;
+        .forget {
+            text-align: right;
+            margin-top: 10px;
         }
 
-        .margin {
+        .signup-link {
             margin-top: 20px;
-            margin-bottom: 10px;
-            margin-left: 20px;
-            margin-right: 30px;
+            text-align: center;
         }
-        
-        .forget
-        {
-            text-align: right;
-            margin-top: 15px;
-        }
+
       
     </style>
+    @if (TempData["ShowLogoutSuccess"] != null)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const logoutModal = new bootstrap.Modal(document.getElementById('logoutSuccessModal'));
+                logoutModal.show();
+            });
+        </script>
+    }
+   
     @if (TempData["Message"] != null)
     {
         <script type="text/javascript">
@@ -91,7 +91,7 @@
     }
 </head>
 <body>
-    <div class="login-card container mt-5">
+    <div class="login-card">
         <h2>Log in</h2>
         <form asp-action="Login" method="post" novalidate>
             <div class="mb-3">
@@ -102,32 +102,47 @@
 
             <div class="mb-3">
                 <label asp-for="Password" class="form-label">Password</label>
-                <input asp-for="Password" type="password" class="form-control" placeholder="password" />
+                <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
                 <span asp-validation-for="Password" class="text-danger small"></span>
             </div>
 
-            <div class="form-check mb-4">
+            <div class="form-check mb-3">
                 <input asp-for="RememberMe" class="form-check-input" />
                 <label asp-for="RememberMe" class="form-check-label">Remember me?</label>
             </div>
+
             <div class="mb-3 text-danger">
                 @Html.ValidationSummary(false, "", new { @class = "text-danger" })
             </div>
+
             <button type="submit" class="btn btn-login">Log in</button>
-            <div>
-              <a asp-controller="Admin" asp-action="Register" class="btn btn-outline-success Margin">Sign Up</a>
-              <a asp-controller="Admin" asp-action="Update" asp-route-email="@Model.Email" class="btn btn-outline-success forget">Forget Password</a>
-           </div>
-   
-    </form>
+
+            @* <div class="forget"><a asp-controller="Admin" asp-action="Update" asp-route-email="@Model?.Email">Forgot Password?</a></div><div class="signup-link"><a asp-controller="Admin" asp-action="Register" class="btn btn-outline-primary btn-sm mt-2">Sign Up</a> </div> *@
+            
+            <!-- Logout Success Modal -->
+            <div class="modal fade" id="logoutSuccessModal" tabindex="-1" aria-labelledby="logoutSuccessModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-success">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="logoutSuccessModalLabel">
+                                <i class="bi bi-check-circle-fill me-2"></i> Logged Out
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <p class="mb-0">✅ You have been logged out successfully.</p>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+        </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"></script>
+ 
+    <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js"></script>
 </body>
 </html>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

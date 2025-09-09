@@ -18,13 +18,9 @@ namespace TalentSubmissionForm.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Create","Talent");
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

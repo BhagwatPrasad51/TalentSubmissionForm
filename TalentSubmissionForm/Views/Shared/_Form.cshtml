@@ -1,4 +1,5 @@
-﻿@model TalentSubmissionForm.Models.TalentUserCreate
+﻿@using TalentSubmissionForm.Helper
+@model TalentSubmissionForm.Models.TalentUserCreate
 @{
     Layout = null;
 }
@@ -8,179 +9,178 @@
         <span class="badge" id="photoCount"><span id="counting">@Model.images?.Count() </span> / 4 photos</span>
     </div>
     <div class="card-body">
+
         <form id="talentForm" asp-action="@ViewData["FormAction"]" asp-controller="@ViewData["FormController"]" method="post" novalidate>
-            <div class="cardA">
-                <div class="row">
-                    <div class="col-md-6">
-                        @if (Model.Id != 0)
-                        {
-                            <input type="hidden" asp-for="Id" />
-                        }
-                        <div class="form-group">
-                            <label class="custom-label fw-bold required" for="firstName">First Name</label>
-                            <input class="form-control" id="firstName" asp-for="firstName" name="firstName" type="text" placeholder="Jane" required minlength="3" />
-                            <span asp-validation-for="firstName" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="custom-label fw-bold required" for="lastName">Last Name</label>
-                            <input class="form-control" id="lastName" asp-for="lastName" name="lastName" type="text" placeholder="Doe" required minlength="3" />
-                            <span asp-validation-for="lastName" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="custom-label fw-bold required" for="dob">Date of Birth</label>
-                            <input class="form-control" id="dob" asp-for="dob" name="dob" type="date" required placeholder="01/01/2007" oncopy="return false" onpaste="return false" oncut="return false" , autocomplete="off" />
-                            <span asp-validation-for="dob" class="text-danger"></span>
-                            <div class="hint">You must be 18+ to apply.</div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="custom-label fw-bold required" for="city">City Location</label>
-                            <input class="form-control" id="city" asp-for="city" name="city" type="text" placeholder="London" required />
-                            <span asp-validation-for="city" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="custom-label fw-bold required">Gender</label>
-                            <div class="radio-group" role="radiogroup" aria-labelledby="genderLegend">
-                                @*  <span id="genderLegend" class="sr-only">Gender</span> *@
-                                <label class="radio-pill form-check-label" for="genderMale">
-                                    <input class="form-check-input" type="radio" id="genderMale" asp-for="gender" name="gender" value="Male" required />
-                                    <span>Male</span>
-                                </label>
-                                <label class="radio-pill form-check-label" for="genderFemale">
-                                    <input class="form-check-input" asp-for="gender" type="radio" id="genderFemale" name="gender" value="Female" />
-                                    <span>Female</span>
-                                </label>
-
-                            </div>
-                            <span asp-validation-for="gender" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="custom-label fw-bold required" for="email">Email address</label>
-                            <input class="form-control" id="email" asp-for="email" name="email" type="email" placeholder="you@example.com" required />
-                            <span asp-validation-for="email" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="custom-label fw-bold required" for="phone">Phone Number</label>
-                            <input class="form-control" id="phone" asp-for="phone" name="phone" type="tel" placeholder="+44 7123 456 789" pattern="^[+]?\d[\d\s()-]{7,}$" required />
-                            <div class="hint">Include country code, e.g. +44</div>
-                            <span asp-validation-for="phone" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="custom-label fw-bold required" for="Height">Height</label>
-                            <input class="form-control" id="Height" asp-for="Height" name="Height" type="tel" placeholder="6.11" required />
-                            <div class="hint">hieght between 5 - 10.</div>
-                            <span asp-validation-for="Height" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="custom-label fw-bold" for="socials">Links to social media</label>
-                            <textarea class="form-control" asp-for="socials" id="socials" name="socials" rows="2" placeholder="https://instagram.com/yourhandle&#10;https://tiktok.com/yourhandle"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="otherInfo" class="custom-label fw-bold">Any other relevant information</label>
-                            <textarea class="form-control" id="otherInfo" asp-for="otherInfo" name="otherInfo" rows="3" placeholder="Tell us about your experience, skills, or availability..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="custom-label fw-bold required">Which are you interested in</label>
-                            <div class="d-flex gap-3 flex-wrap mt-2">
-                                <div col-md-4>
-                                    <label class="check-pill" for="interestModelling">
-                                        <input type="checkbox" id="interestModelling" name="interests" value="Modelling" @(Model?.interests?.Contains("Modelling") == true ? "checked" : "")> Modelling
-                                    </label>
-                                </div>
-                                <div col-md-4>
-                                    <label class="check-pill" for="interestActing">
-                                        <input type="checkbox" id="interestActing" name="interests" value="Acting"  @(Model?.interests?.Contains("Acting") == true ? "checked" : "")> Acting
-                                    </label>
-                                </div>
-                                <div col-md-4>
-                                    <label class="check-pill" for="interestDating">
-
-                                        <input type="checkbox" id="interestDating" name="interests" value="Dating show and podcast" @(Model?.interests?.Contains("Dating show and podcast")==true ? "checked" : null)> Dating show & podcast
-                                    </label>
-                                </div>
-
-                            </div>
-                            <span asp-validation-for="interests" class="text-danger"></span>
-                            <div class="hint">Choose at least one.</div>
-                        </div>
-                    </div>
-
-                    <!-- Image Upload -->
-                    <div class="dropzone" id="dropzone" aria-label="Upload up to four photos" tabindex="0">
-                        <div>
-                            <strong>Photos</strong>
-                            <div class="dz-instructions">Drag & drop or click to upload. Max 4 images (JPG/PNG/WebP), up to 10MB each. Clear, well-lit portraits preferred.</div>
-                            <div class="note" id="dzNote"></div>
-                            <input id="fileInput" class="sr-only" type="file" accept="image/*" multiple aria-hidden="true" />
-                            <div id="uploadStatus" class="mt-2 text-info"></div>
-
-                        </div>
-                        <div class="thumbs" id="thumbs"></div>
-                    </div>
-
-                    <div id="img">
-                        @if (Model.images != null && Model.images.Any())
-                        {
-                            foreach (var image in Model.images)
-                            {
-                                var imageUrl = Url.Content("~/uploads/" + image);
-                                <div class="uploaded-image" data-filename="@image" style="display:inline-block; position:relative; margin:5px;">
-                                    <img src="@imageUrl" alt="Uploaded Image" style="max-width: 200px; max-height: 400px; display:block;" />
-                                    <input type="hidden" name="images" value="@image" />
-                                    <button type="button" class="remove-file-text" style="background:none; color:red; border:none; cursor:pointer; font-size:14px;">🗑️ Remove File</button>
-                                </div>
-                            }
-                        }
-                    </div>
-
-                    <span asp-validation-for="images" class="text-danger"></span>
-                    @if (Model.Id > 0)
-                    {
-                        <div class="actions grid-12">
-                            <span class="status" id="status" role="status" aria-live="polite"></span>
-                            <div style="display:flex; gap:10px;">
-                                <button class="btn btn-secondary btn-sm right" id="backBtn" type="button" aria-label="Reset form">Back</button>
-                                <button class="btn primary" id="submitBtn" type="submit">Update</button>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="actions grid-12">
-                            <span class="status" id="status" role="status" aria-live="polite"></span>
-                            <div style="display:flex; gap:10px;">
-                                <button class="btn primary" id="submitBtn" type="submit">Submit</button>
-                            </div>
-                        </div>
-                    }
-                </div>
+            <div class="grid-6">
+                @if (Model.Id != 0)
+                {
+                    <input type="hidden" asp-for="Id" />
+                }
+                <label class="required" for="firstName">First Name</label>
+                <input class="input" id="firstName" asp-for="firstName" name="firstName" type="text" placeholder="Jane" required minlength="3" />
+                <span asp-validation-for="firstName" class="text-danger"></span>
             </div>
+            <div class="grid-6">
+
+                <label class="required" for="lastName">Last Name</label>
+                <input class="input" id="lastName" asp-for="lastName" name="lastName" type="text" placeholder="Doe" required minlength="3" />
+                <span asp-validation-for="lastName" class="text-danger"></span>
+
+            </div>
+
+            <div class="grid-4">
+                <label class="required" for="dob">Date of Birth</label>
+                <input class="input" id="dob" asp-for="dob" name="dob" type="date" required placeholder="01/01/2007" oncopy="return false" onpaste="return false" oncut="return false" , autocomplete="off" />
+                <span asp-validation-for="dob" class="text-danger"></span>
+                <div class="hint">You must be 18+ to apply.</div>
+            </div>
+
+            <div class="grid-4">
+
+                <label class="required" for="city">City Location</label>
+                <input class="input" id="city" asp-for="city" name="city" type="text" placeholder="London" required />
+                <span asp-validation-for="city" class="text-danger"></span>
+
+            </div>
+
+            <div class="grid-4">
+
+                <label class="required">Gender</label>
+                <div class="radio-group" role="radiogroup" aria-labelledby="genderLegend">
+                    <span id="genderLegend" class="sr-only">Gender</span>
+                    <label class="radio-pill" for="genderMale">
+                        <input type="radio" id="genderMale" asp-for="gender" name="gender" value="Male" required />
+                        <span>Male</span>
+                    </label>
+                    <label class="radio-pill" for="genderFemale">
+                        <input asp-for="gender" type="radio" id="genderFemale" name="gender" value="Female" />
+                        <span>Female</span>
+                    </label>
+
+                </div>
+                <span asp-validation-for="gender" class="text-danger"></span>
+            </div>
+
+
+            <div class="grid-4">
+                <label class="required" for="email">Email address</label>
+                <input class="input" id="email" asp-for="email" name="email" type="email" placeholder="you@example.com" required />
+                <span asp-validation-for="email" class="text-danger"></span>
+
+            </div>
+            <div class="grid-4">
+                <label class="required" for="phone">Phone Number</label>
+                <input class="input" id="phone" asp-for="phone" name="phone" type="tel" placeholder="+44 7123 456 789" pattern="^[+]?\d[\d\s()-]{7,}$" required />
+                <div class="hint">Include country code, e.g. +44</div>
+                <span asp-validation-for="phone" class="text-danger"></span>
+            </div>
+            <div class="grid-4">
+                <label class="required" for="Height">Height</label>
+                <input class="input" id="Height" asp-for="Height" name="Height" type="tel" placeholder="6.11" required />
+                <div class="hint">hieght between 5 - 10.</div>
+                <span asp-validation-for="Height" class="text-danger"></span>
+            </div>
+
+            <div class="grid-12">
+                <label for="socials">Links to social media</label>
+                <textarea class="input" asp-for="socials" id="socials" name="socials" rows="2" placeholder="https://instagram.com/yourhandle&#10;https://tiktok.com/yourhandle"></textarea>
+
+            </div>
+
+            <div class="grid-12">
+                <label for="otherInfo">Any other relevant information</label>
+                <textarea class="input" id="otherInfo" asp-for="otherInfo" name="otherInfo" rows="3" placeholder="Tell us about your experience, skills, or availability..."></textarea>
+
+            </div>
+
+            <div class="grid-12">
+                <label class="required">Which are you interested in</label>
+                <div class="checkboxes">
+                    <label class="check-pill" for="interestModelling">
+                        <input type="checkbox" id="interestModelling" name="interests" value="Modelling" @(Model?.interests?.Contains("Modelling") == true ? "checked" : "")> Modelling
+                    </label>
+
+                    <label class="check-pill" for="interestActing">
+                        <input type="checkbox" id="interestActing" name="interests" value="Acting" @(Model?.interests?.Contains("Acting") == true ? "checked" : "")> Acting
+                    </label>
+                    <label class="check-pill" for="interestDating">
+
+                        <input type="checkbox" id="interestDating" name="interests" value="Dating show and podcast" @(Model?.interests?.Contains("Dating show and podcast") == true ? "checked" : null)> Dating show & podcast
+                    </label>
+
+                </div>
+                <span asp-validation-for="interests" class="text-danger"></span>
+                <div class="hint">Choose at least one.</div>
+            </div>
+            @if (Model.Id > 0)
+            {
+                <div class="grid-6">
+                    <label asp-for="Note">Note</label>
+                    <input asp-for="Note" class="input" placeholder="Note" />
+                </div>
+                <div class="grid-6">
+                    <label asp-for="Status">Status</label>
+                    <select asp-for="Status" asp-items="Html.GetEnumSelectList<ApplicationStatus>()" class="input">
+                        <option value="">-- Select Status --</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+            }
+            <!-- Image Upload -->
+            <div class="dropzone" id="dropzone" aria-label="Upload up to four photos" tabindex="0">
+                <div>
+                    <strong>Photos</strong>
+                    <div class="dz-instructions">Drag & drop or click to upload. Max 4 images (JPG/PNG/WebP), up to 10MB each. Clear, well-lit portraits preferred.</div>
+                    <div class="note" id="dzNote"></div>
+                    <input id="fileInput" class="sr-only" type="file" accept="image/*" multiple aria-hidden="true" />
+                    <div id="uploadStatus" class="mt-2 text-info"></div>
+
+                </div>
+                <div class="thumbs" id="thumbs"></div>
+                <span asp-validation-for="images" class="text-danger"></span>
+            </div>
+
+            <div id="img" class="image-preview-container">
+                @if (Model.images != null && Model.images.Any())
+                {
+                    foreach (var image in Model.images)
+                    {
+                        var imageUrl = Url.Content("~/uploads/" + image);
+                        <div class="uploaded-image" data-filename="@image" style="position:relative; margin:5px;">
+                            <img src="@imageUrl" alt="Uploaded Image" style="max-width: 600px; max-height: 500px; display:block;" />
+                            <input type="hidden" name="images" value="@image" />
+                            <div style="display: flex; justify-content: center; gap: 10px;">
+                                <button type="button" class="remove-file-text" style="background:none; color:red; border:none; cursor:pointer; font-size:14px;">🗑️ Remove File</button>
+                                <a href="@imageUrl" download="${@image}" class="download-file-link">⬇️ Download</a>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+
+            @if (Model.Id > 0)
+            {
+                <div class="actions grid-12">
+                    <span class="status" id="status" role="status" aria-live="polite"></span>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-secondary btn-sm right" id="backBtn" type="button" aria-label="Reset form">Back</button>
+                        <button class="btn primary" id="submitBtn" type="submit">Update</button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="actions grid-12">
+                    <span class="status" id="status" role="status" aria-live="polite"></span>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn primary" id="submitBtn" type="submit">Submit</button>
+                    </div>
+                </div>
+            }
+
         </form>
+
+
     </div>
 </section>

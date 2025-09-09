@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Security.Claims;
 using TalentSubmissionForm.Data;
+using TalentSubmissionForm.Helper;
 using TalentSubmissionForm.Models;
 
 namespace TalentSubmissionForm
@@ -53,9 +55,9 @@ namespace TalentSubmissionForm
                 }
 
                 admin.Createdon = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
-                _context.admins.Update(admin); 
+                _context.admins.Update(admin);
                 _context.SaveChanges();
-                return true; 
+                return true;
             }
             catch (Exception ex)
             {
@@ -82,7 +84,7 @@ namespace TalentSubmissionForm
 
         public int GetTalentUserId()
         {
-            int n = _context.talentUsers.Any() ? _context.talentUsers.Max(u => u.Id) : 0; 
+            int n = _context.talentUsers.Any() ? _context.talentUsers.Max(u => u.Id) : 0;
             return n;
         }
         public IEnumerable<TalentUser> GetTalentUserDetails()
@@ -156,9 +158,9 @@ namespace TalentSubmissionForm
             }
             return contentType;
         }
-        public TalentUserCreate GetDetailsByUserId(string  EncodeId)
+        public TalentUserCreate GetDetailsByUserId(string EncodeId)
         {
-            int DecodeId= DecodeTalentID(EncodeId);
+            int DecodeId = DecodeTalentID(EncodeId);
             var talentuser = _context.talentUsers.Where(x => x.Id == DecodeId).FirstOrDefault();
             TalentUserCreate talentUserCreate = new TalentUserCreate();
             talentUserCreate.Id = talentuser.Id;
@@ -173,6 +175,12 @@ namespace TalentSubmissionForm
             talentUserCreate.Height = talentuser.Hieght;
             talentUserCreate.socials = talentuser.SocialInfo;
             talentUserCreate.otherInfo = talentuser.OtherInfo;
+            var parsedStatus = EnumHelper.FromDisplayName<ApplicationStatus>(talentuser.Status);
+            if (parsedStatus != null)
+            {
+                talentUserCreate.Status = parsedStatus.Value;
+            }
+            talentUserCreate.Note = talentuser.Note;
             talentUserCreate.interests = new List<string>();
             string[] interest = talentuser.Interest.Split(',');
             for (int i = 0; i < interest.Length; i++)
@@ -186,12 +194,14 @@ namespace TalentSubmissionForm
             {
                 talentUserCreate.images.Add(image.FileName);
             }
+            
             return talentUserCreate;
         }
+        
 
         public List<UploadedFile> GetImages(int TalentId)
         {
-            var uploadfiles = _context.uploadedFiles.Where(x => x.TalentId == TalentId &&x.Isdeleted!=true).ToList();
+            var uploadfiles = _context.uploadedFiles.Where(x => x.TalentId == TalentId && x.Isdeleted != true).ToList();
             return uploadfiles;
         }
 
@@ -200,9 +210,9 @@ namespace TalentSubmissionForm
             try
             {
                 // _context.talentUsers.Where(x => x.Id == talentUser.Id).FirstOrDefault();
-                var userName=string.IsNullOrEmpty(Convert.ToString(_httpContextAccessor.HttpContext.User.Identity.Name))?"":Convert.ToString(_httpContextAccessor.HttpContext.User.Identity.Name);
+                var userName = string.IsNullOrEmpty(Convert.ToString(_httpContextAccessor.HttpContext.User.Identity.Name)) ? "" : Convert.ToString(_httpContextAccessor.HttpContext.User.Identity.Name);
                 talentUser.Updatedby = userName;
-                talentUser.Updatedon=Convert.ToString(DateTime.Now);
+                talentUser.Updatedon = Convert.ToString(DateTime.Now);
                 _context.Update(talentUser);
                 _context.SaveChanges();
                 return 1;
@@ -240,7 +250,7 @@ namespace TalentSubmissionForm
                     var existingFile = existingUploadfiles.FirstOrDefault(x => x.FileName == fileName);
 
                     if (existingFile != null)
-                    { 
+                    {
                         existingFile.FilePath = fullPath;
                         existingFile.Size = fileInfo.Length.ToString();
                         existingFile.Extension = fileInfo.Extension;
@@ -283,7 +293,7 @@ namespace TalentSubmissionForm
 
             try
             {
-                var cleanInput = encodedTalentID.Trim().Replace(' ', '+'); 
+                var cleanInput = encodedTalentID.Trim().Replace(' ', '+');
                 byte[] decodedBytes = Convert.FromBase64String(cleanInput);
                 return BitConverter.ToInt32(decodedBytes, 0);
             }
